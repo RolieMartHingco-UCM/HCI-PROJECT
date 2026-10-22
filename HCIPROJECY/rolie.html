@@ -1,0 +1,254 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Player 1: Rolie Mart Hingco</title>
+<link href="https://fonts.googleapis.com/css2?family=Chakra+Petch:wght@500;700&family=DM+Sans:wght@400;500&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#1b1340;--panel:#271c5c;--ink:#f4f1ff;--mute:#b5abe0;--a:#38e8ff;--b:#ff4fa3;--y:#ffd23f;--r:14px}
+*{box-sizing:border-box;margin:0}
+html{scroll-behavior:smooth}
+body{font-family:'DM Sans',system-ui,sans-serif;background:radial-gradient(circle at 80% -10%,#3a2a8c 0,var(--bg) 55%) fixed;color:var(--ink);line-height:1.6}
+h1,h2,h3,.hud{font-family:'Chakra Petch',system-ui,sans-serif}
+:focus-visible{outline:3px solid var(--y);outline-offset:3px}
+.wrap{max-width:960px;margin:0 auto;padding:0 20px}
+/* HCI: Visibility + Jakob's Law - familiar sticky top menu, few links (Hick's Law) */
+nav{position:sticky;top:0;z-index:5;background:rgba(27,19,64,.88);backdrop-filter:blur(8px)}
+nav .wrap{display:flex;gap:18px;align-items:center;padding:12px 20px;flex-wrap:wrap}
+nav a{color:var(--ink);text-decoration:none;font-weight:500}
+nav a:hover{color:var(--a)}
+.sp{flex:1}
+.hue{border:2px solid var(--a);background:none;color:var(--a);border-radius:99px;padding:4px 14px;cursor:pointer}
+.hero{display:grid;grid-template-columns:1.4fr 1fr;gap:36px;align-items:center;padding:48px 0 24px}
+.tag{color:var(--y);font-family:'Chakra Petch';font-weight:700}
+h1{font-size:clamp(2.6rem,7.5vw,5.2rem);font-weight:700;letter-spacing:-.02em;margin:6px 0}
+h1 em{font-style:normal;color:var(--a);text-shadow:0 0 24px color-mix(in srgb,var(--a) 60%,transparent)}
+.line{font-size:1.25rem;min-height:2em}
+/* HCI: Von Restorff - the highlighted role is the one different item */
+.line b{background:var(--y);color:#1b1340;padding:0 10px;border-radius:6px}
+.cur{display:inline-block;width:2px;height:1.1em;background:var(--ink);vertical-align:middle;animation:bl 1s steps(1) infinite}
+@keyframes bl{50%{opacity:0}}
+.btns{display:flex;gap:12px;flex-wrap:wrap;margin-top:20px}
+/* HCI: Fitts's Law - large, well-spaced targets */
+.btn{background:var(--b);color:#fff;border:0;border-radius:99px;padding:14px 28px;font:700 1rem 'Chakra Petch';cursor:pointer;text-decoration:none;transition:transform .15s,box-shadow .15s;box-shadow:0 4px 0 #a02a68}
+.btn:hover{transform:translateY(-2px)}
+.btn:active{transform:translateY(3px);box-shadow:0 1px 0 #a02a68}
+.btn.alt{background:transparent;border:2px solid var(--ink);box-shadow:none}
+.card{background:var(--panel);border:2px solid color-mix(in srgb,var(--a) 50%,transparent);border-radius:var(--r);padding:20px}
+.pcard{justify-self:center;width:min(320px,100%)}
+.pic{aspect-ratio:1;border-radius:12px;overflow:hidden;background:var(--b);cursor:pointer;transition:transform .1s}
+.pic img{width:100%;height:100%;object-fit:cover;display:block}
+.stats{display:flex;justify-content:space-between;margin-top:12px;font-family:'Chakra Petch';font-weight:700}
+.stats span{color:var(--y)}
+.fx{position:fixed;pointer-events:none;font-size:2rem;z-index:30;animation:up 1s ease-out forwards}
+@keyframes up{to{transform:translateY(-90px) scale(1.5);opacity:0}}
+section{padding:44px 0}
+h2{font-size:clamp(1.8rem,4vw,2.5rem);margin-bottom:6px}
+.sub{color:var(--mute);max-width:60ch;margin-bottom:20px}
+/* game */
+.hud{display:flex;justify-content:space-between;flex-wrap:wrap;gap:10px;font-weight:700;margin-bottom:10px}
+.hud span b{color:var(--y)}
+#arena{position:relative;height:300px;border-radius:var(--r);background:repeating-linear-gradient(45deg,#201650,#201650 14px,#241a5a 14px,#241a5a 28px);border:2px dashed var(--a);overflow:hidden;touch-action:manipulation;cursor:crosshair}
+#target{position:absolute;border:0;border-radius:50%;background:radial-gradient(circle,var(--y) 0 25%,var(--b) 26% 55%,#fff 56% 70%,var(--b) 71%);cursor:pointer;display:none}
+#overlay{position:absolute;inset:0;display:grid;place-items:center;text-align:center;padding:20px;background:rgba(27,19,64,.7)}
+#overlay p{margin-bottom:12px}
+.dayc{display:flex;gap:24px;align-items:center;flex-wrap:wrap}
+.demo{font-size:4.5rem;width:110px;text-align:center}
+.clock{font:700 2rem 'Chakra Petch'}
+input[type=range]{width:100%;accent-color:var(--b)}
+/* skills */
+.skill{cursor:pointer;padding:6px 0}
+.skill .t{display:flex;justify-content:space-between;font-weight:500}
+.bar{height:14px;border-radius:99px;background:rgba(255,255,255,.12);margin-top:5px;overflow:hidden}
+.bar i{display:block;height:100%;width:0;background:linear-gradient(90deg,var(--a),var(--b));border-radius:99px;transition:width 1.2s cubic-bezier(.2,.8,.2,1)}
+.skill p{max-height:0;overflow:hidden;color:var(--mute);font-size:.92rem;transition:max-height .3s}
+.skill.open p{max-height:80px;padding-top:6px}
+/* inventory */
+.chips{display:flex;flex-wrap:wrap;gap:10px;margin-bottom:14px}
+.chip{border:2px solid var(--a);background:var(--panel);color:var(--ink);border-radius:99px;padding:10px 20px;cursor:pointer;font:500 1rem 'DM Sans';transition:transform .15s}
+.chip:hover{transform:rotate(-3deg) scale(1.05)}
+.chip[aria-pressed=true]{background:var(--a);color:#1b1340}
+/* quests */
+.quests{display:grid;gap:12px}
+.q{cursor:pointer;text-align:left;width:100%;color:var(--ink);font:inherit}
+.q h3{font-size:1.15rem;display:flex;justify-content:space-between}
+.q p{max-height:0;overflow:hidden;color:var(--mute);transition:max-height .3s}
+.q.open p{max-height:90px;margin-top:6px}
+footer{text-align:center;padding:50px 0 70px}
+.toast{position:fixed;bottom:22px;left:50%;transform:translate(-50%,90px);background:var(--y);color:#1b1340;font-weight:700;padding:10px 22px;border-radius:99px;transition:transform .3s;z-index:40}
+.toast.on{transform:translate(-50%,0)}
+@media(max-width:760px){.hero{grid-template-columns:1fr;padding-top:24px}}
+@media(prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
+</style>
+</head>
+<body>
+<nav><div class="wrap">
+  <strong class="hud">RMH</strong><span class="sp"></span>
+  <a href="#play">My day</a><a href="#skills">Skills</a><a href="#loot">Favorites</a><a href="#quests">Quests</a>
+  <button class="hue" id="hue" aria-label="Change accent color">Change color</button>
+</div></nav>
+
+<main class="wrap">
+  <header class="hero">
+    <div>
+      <p class="tag">PLAYER 1 · LEVEL 3 · BSIT</p>
+      <h1>Rolie Mart <em>Hingco</em></h1>
+      <p class="line">I'm a <b id="role"></b><span class="cur"></span></p>
+      <p class="sub" id="bio" style="margin-top:12px"></p>
+      <div class="btns">
+        <a class="btn" href="#play">See my day</a>
+        <button class="btn alt" id="copy">Copy my email</button>
+      </div>
+    </div>
+    <div class="card pcard">
+      <div class="pic" id="pic" title="Click me!"><img src="photo.jpg" alt="Photo of Rolie Mart Hingco" onerror="this.onerror=null;this.src=fb()"></div>
+      <div class="stats"><span>HP ♥♥♥♥♥</span><span id="xp">XP 0</span></div>
+      <p class="sub" style="margin:8px 0 0;font-size:.85rem">Click my photo to earn XP.</p>
+    </div>
+  </header>
+
+  <!-- HCI: User control + immediate feedback - dragging the slider instantly updates the whole card -->
+  <section id="play">
+    <h2>A day in my life</h2>
+    <p class="sub">Drag the slider to see what I'm doing at any time of day.</p>
+    <div class="card dayc">
+      <div class="demo" id="dE">😴</div>
+      <div style="flex:1;min-width:220px">
+        <div class="clock" id="dT">12:00 AM</div>
+        <div id="dX" style="margin:2px 0 10px"></div>
+        <input type="range" id="sl" min="0" max="47" value="0" aria-label="Time of day">
+        <button class="chip" id="now" style="margin-top:12px">What am I doing right now?</button>
+      </div>
+    </div>
+  </section>
+
+  <section id="skills">
+    <h2>Skill tree</h2>
+    <p class="sub">I'm still learning, so these bars show where I am right now. Tap a skill for details.</p>
+    <div class="card" id="skillList"></div>
+  </section>
+
+  <section id="loot">
+    <h2>Favorites</h2>
+    <p class="sub">Pick one to find out why I love it.</p>
+    <div class="chips" id="chips"></div>
+    <div class="card" id="fact" style="min-height:4.2em">Pick a favorite above.</div>
+  </section>
+
+  <section id="quests">
+    <h2>Quest log</h2>
+    <p class="sub">My story as a BSIT student so far. Tap a quest to open it.</p>
+    <div class="quests" id="qList"></div>
+  </section>
+</main>
+
+<footer class="wrap">
+  <h2>Want to team up?</h2>
+  <p class="sub" style="margin:0 auto 18px">Message me about a project, a game night, or a bug you can't fix.</p>
+  <button class="btn" id="copy2">Copy my email</button>
+  <p class="sub" style="margin:22px auto 0;font-size:.85rem">Secret: try the Konami code (↑ ↑ ↓ ↓ ← → ← → B A).</p>
+</footer>
+<div class="toast" id="toast" role="status"></div>
+
+<script>
+/* ===== EDIT THIS PART WITH YOUR REAL DETAILS ===== */
+const ME={
+  initials:"RMH",
+  email:"roliemart108@gmail.com",
+  roles:["BSIT 3rd-year student","programming learner","gamer","future developer"],
+  bio:"I'm still learning programming, one bug at a time. I love video games, and I want to build things people enjoy using.",
+  skills:[
+    {n:"HTML",v:80,d:"I can build page structure: headings, lists, links, images and forms."},
+    {n:"CSS",v:70,d:"Still learning layouts and styling. Every new page teaches me something."},
+    {n:"Python",v:50,d:"Beginner level: I can write basic programs and school activities."},
+    {n:"Teamwork",v:85,d:"This is my strongest skill. I communicate and do my part in group projects."}
+  ],
+  favs:[
+    {n:"Mobile Legends",f:"Teamwork and quick decisions under pressure. Great training for group projects."},
+    {n:"Valorant",f:"Aim, strategy and communication. Every round is a mini problem to solve."},
+    {n:"Minecraft",f:"Where I first got curious about logic and building systems."},
+    {n:"Learning to code",f:"I'm not an expert yet, but I love the moment my code finally runs without errors."}
+  ],
+ 
+quests: [
+  {
+    t: "Year 1: Learn the Basics",
+    d: "I started learning C, C++, HTML, and CSS. These helped me understand programming basics and how to create and design web pages."
+  },
+  {
+    t: "Year 2: Explore More Languages",
+    d: "I learned C# with databases and Java. I continued improving my programming skills and learning how to work with data."
+  },
+  {
+    t: "Year 3: Still Learning, Still Growing",
+    d: "I'm currently learning Python and databases. I'm not an expert yet, but I'm continuing to practice, improve my skills, and learn something new every day."
+  }
+]
+
+};
+/* ================================================== */
+const $=s=>document.querySelector(s),A=s=>[...document.querySelectorAll(s)];
+const toast=m=>{const t=$('#toast');t.textContent=m;t.classList.add('on');clearTimeout(toast.i);toast.i=setTimeout(()=>t.classList.remove('on'),2200)};
+function fb(){return 'data:image/svg+xml,'+encodeURIComponent(`<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 200"><rect width="200" height="200" fill="#ff4fa3"/><text x="100" y="120" font-size="64" font-family="sans-serif" font-weight="800" text-anchor="middle" fill="#1b1340">${ME.initials}</text></svg>`)}
+$('#bio').textContent=ME.bio;
+
+/* typing role */
+let ri=0,ci=0,del=false;
+(function ty(){const w=ME.roles[ri];$('#role').textContent=w.slice(0,ci)||'\u00a0';
+ if(!del&&ci===w.length){del=true;return setTimeout(ty,1400)}
+ if(del&&ci===0){del=false;ri=(ri+1)%ME.roles.length}
+ ci+=del?-1:1;setTimeout(ty,del?35:75)})();
+
+/* XP from photo clicks (Feedback) */
+let xp=0;const fxs=['⭐','💥','🎮','✨','🔥'];
+$('#pic').onclick=e=>{xp+=10;$('#xp').textContent='XP '+xp;
+ const s=document.createElement('span');s.className='fx';s.textContent=fxs[Math.random()*5|0];s.style.left=e.clientX-16+'px';s.style.top=e.clientY-16+'px';document.body.appendChild(s);setTimeout(()=>s.remove(),1000);
+ if(xp===100)toast('Level up! You found the secret XP.')};
+
+/* day in my life */
+const DAY=[
+ [0,"😴","Sleeping."],
+ [8,"🌅","Just woke up."],
+ [9,"🚴","Exercising on the stationary bike."],
+ [10,"🍳","Eating breakfast."],
+ [11,"🎒","Preparing for school."],
+ [12,"🏫","At school. Classes until 9:30 PM."],
+ [21.5,"🚌","Leaving school and heading home."],
+ [22,"🍽️","Having dinner."],
+ [23,"😴","Time to sleep."]
+];
+const sl=$('#sl');
+function showDay(){const m=+sl.value*30,h=m/60;let c=DAY[0];DAY.forEach(d=>{if(h>=d[0])c=d});
+ $('#dE').textContent=c[1];$('#dX').textContent=c[2];
+ const hh=Math.floor(h),mm=m%60;$('#dT').textContent=((hh%12)||12)+':'+String(mm).padStart(2,'0')+' '+(hh<12?'AM':'PM')}
+sl.oninput=showDay;showDay();
+$('#now').onclick=()=>{const n=new Date();sl.value=n.getHours()*2+(n.getMinutes()>=30?1:0);showDay();toast('Showing the current time')};
+
+/* skills / favs / quests */
+ME.skills.forEach(s=>{const d=document.createElement('div');d.className='skill';d.tabIndex=0;d.setAttribute('role','button');
+ d.innerHTML=`<div class="t"><span>${s.n}</span><span>${s.v}%</span></div><div class="bar"><i data-w="${s.v}"></i></div><p>${s.d}</p>`;
+ const f=()=>d.classList.toggle('open');d.onclick=f;d.onkeydown=e=>{if(e.key==='Enter'||e.key===' '){e.preventDefault();f()}};$('#skillList').appendChild(d)});
+new IntersectionObserver((es,o)=>es.forEach(e=>{if(e.isIntersecting){A('#skillList i').forEach(i=>i.style.width=i.dataset.w+'%');o.disconnect()}}),{threshold:.3}).observe($('#skillList'));
+ME.favs.forEach(h=>{const c=document.createElement('button');c.className='chip';c.textContent=h.n;c.setAttribute('aria-pressed','false');
+ c.onclick=()=>{A('.chip').forEach(x=>x.setAttribute('aria-pressed','false'));c.setAttribute('aria-pressed','true');$('#fact').textContent=h.f};$('#chips').appendChild(c)});
+ME.quests.forEach(q=>{const b=document.createElement('button');b.className='card q';b.innerHTML=`<h3>${q.t}<span>+</span></h3><p>${q.d}</p>`;
+ b.onclick=()=>{b.classList.toggle('open');b.querySelector('span').textContent=b.classList.contains('open')?'−':'+'};$('#qList').appendChild(b)});
+
+/* accent color (User control) */
+const hues=[['#38e8ff','#ff4fa3'],['#7dff8a','#ffd23f'],['#ffb347','#ff4f6d'],['#c79bff','#38e8ff']];let hi=0;
+$('#hue').onclick=()=>{hi=(hi+1)%hues.length;document.documentElement.style.setProperty('--a',hues[hi][0]);document.documentElement.style.setProperty('--b',hues[hi][1])};
+
+/* copy email */
+const cp=()=>{(navigator.clipboard?navigator.clipboard.writeText(ME.email):Promise.reject()).then(()=>toast('Email copied!')).catch(()=>toast('My email: '+ME.email))};
+$('#copy').onclick=cp;$('#copy2').onclick=cp;
+
+/* confetti + Konami */
+function confetti(){const cv=document.createElement('canvas');cv.style.cssText='position:fixed;inset:0;pointer-events:none;z-index:50';cv.width=innerWidth;cv.height=innerHeight;document.body.appendChild(cv);const x=cv.getContext('2d');
+ const p=Array.from({length:120},()=>({x:innerWidth/2,y:innerHeight/2,vx:(Math.random()-.5)*16,vy:Math.random()*-14-2,c:['#38e8ff','#ffd23f','#ff4fa3','#7dff8a'][Math.random()*4|0],s:Math.random()*8+4}));let f=0;
+ (function a(){x.clearRect(0,0,cv.width,cv.height);p.forEach(q=>{q.x+=q.vx;q.y+=q.vy;q.vy+=.4;x.fillStyle=q.c;x.fillRect(q.x,q.y,q.s,q.s)});++f<110?requestAnimationFrame(a):cv.remove()})()}
+const kc=['ArrowUp','ArrowUp','ArrowDown','ArrowDown','ArrowLeft','ArrowRight','ArrowLeft','ArrowRight','b','a'];let ki=0;
+addEventListener('keydown',e=>{ki=(e.key===kc[ki]||e.key.toLowerCase()===kc[ki])?ki+1:0;if(ki===kc.length){ki=0;confetti();toast('Cheat code activated! +30 lives')}});
+</script>
+</body>
+</html>
