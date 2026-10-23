@@ -1,0 +1,429 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Player 1: Rolie Mart Hingco</title>
+<link href="https://fonts.googleapis.com/css2?family=Chakra+Petch:wght@500;700&family=DM+Sans:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  .profile-photo {
+    width: 180px;
+    height: 180px;
+    object-fit: cover;
+    border-radius: 50%;
+    border: 3px solid #38e8ff;
+}
+:root{--bg:#1b1340;--panel:#271c5c;--ink:#f4f1ff;--mute:#b5abe0;--a:#38e8ff;--b:#ff4fa3;--y:#ffd23f;--r:14px}
+*{box-sizing:border-box;margin:0}
+html{scroll-behavior:smooth}
+body{font-family:'DM Sans',system-ui,sans-serif;background:radial-gradient(circle at 80% -10%,#3a2a8c 0,var(--bg) 55%) fixed;color:var(--ink);line-height:1.6}
+h1,h2,h3,.hud{font-family:'Chakra Petch',system-ui,sans-serif}
+:focus-visible{outline:3px solid var(--y);outline-offset:3px}
+.wrap{max-width:960px;margin:0 auto;padding:0 20px}
+/* HCI: Visibility + Jakob's Law - familiar sticky top menu, few links (Hick's Law) */
+nav{position:sticky;top:0;z-index:5;background:rgba(27,19,64,.88);backdrop-filter:blur(8px)}
+nav .wrap{display:flex;gap:18px;align-items:center;padding:12px 20px;flex-wrap:wrap}
+nav a{color:var(--ink);text-decoration:none;font-weight:500}
+nav a:hover{color:var(--a)}
+.sp{flex:1}
+.hue{border:2px solid var(--a);background:none;color:var(--a);border-radius:99px;padding:4px 14px;cursor:pointer}
+.hero{display:grid;grid-template-columns:1.4fr 1fr;gap:36px;align-items:center;padding:48px 0 24px}
+.tag{color:var(--y);font-family:'Chakra Petch';font-weight:700}
+h1{font-size:clamp(2.6rem,7.5vw,5.2rem);font-weight:700;letter-spacing:-.02em;margin:6px 0}
+h1 em{font-style:normal;color:var(--a);text-shadow:0 0 24px color-mix(in srgb,var(--a) 60%,transparent)}
+.line{font-size:1.25rem;min-height:2em}
+/* HCI: Von Restorff - the highlighted role is the one different item */
+.line b{background:var(--y);color:#1b1340;padding:0 10px;border-radius:6px}
+.cur{display:inline-block;width:2px;height:1.1em;background:var(--ink);vertical-align:middle;animation:bl 1s steps(1) infinite}
+@keyframes bl{50%{opacity:0}}
+.btns{display:flex;gap:12px;flex-wrap:wrap;margin-top:20px}
+/* HCI: Fitts's Law - large, well-spaced targets */
+.btn{background:var(--b);color:#fff;border:0;border-radius:99px;padding:14px 28px;font:700 1rem 'Chakra Petch';cursor:pointer;text-decoration:none;transition:transform .15s,box-shadow .15s;box-shadow:0 4px 0 #a02a68}
+.btn:hover{transform:translateY(-2px)}
+.btn:active{transform:translateY(3px);box-shadow:0 1px 0 #a02a68}
+.btn.alt{background:transparent;border:2px solid var(--ink);box-shadow:none}
+.card{background:var(--panel);border:2px solid color-mix(in srgb,var(--a) 50%,transparent);border-radius:var(--r);padding:20px}
+.pcard{justify-self:center;width:min(320px,100%)}
+.pic{aspect-ratio:1;border-radius:12px;overflow:hidden;background:var(--b);cursor:pointer;transition:transform .1s}
+.pic img{width:100%;height:100%;object-fit:cover;display:block}
+.stats{display:flex;justify-content:space-between;margin-top:12px;font-family:'Chakra Petch';font-weight:700}
+.stats span{color:var(--y)}
+.fx{position:fixed;pointer-events:none;font-size:2rem;z-index:30;animation:up 1s ease-out forwards}
+@keyframes up{to{transform:translateY(-90px) scale(1.5);opacity:0}}
+section{padding:44px 0}
+h2{font-size:clamp(1.8rem,4vw,2.5rem);margin-bottom:6px}
+.sub{color:var(--mute);max-width:60ch;margin-bottom:20px}
+/* game */
+.hud{display:flex;justify-content:space-between;flex-wrap:wrap;gap:10px;font-weight:700;margin-bottom:10px}
+.hud span b{color:var(--y)}
+#arena{position:relative;height:300px;border-radius:var(--r);background:repeating-linear-gradient(45deg,#201650,#201650 14px,#241a5a 14px,#241a5a 28px);border:2px dashed var(--a);overflow:hidden;touch-action:manipulation;cursor:crosshair}
+#target{position:absolute;border:0;border-radius:50%;background:radial-gradient(circle,var(--y) 0 25%,var(--b) 26% 55%,#fff 56% 70%,var(--b) 71%);cursor:pointer;display:none}
+#overlay{position:absolute;inset:0;display:grid;place-items:center;text-align:center;padding:20px;background:rgba(27,19,64,.7)}
+#overlay p{margin-bottom:12px}
+.dayc{display:flex;gap:24px;align-items:center;flex-wrap:wrap}
+.demo{font-size:4.5rem;width:110px;text-align:center}
+.clock{font:700 2rem 'Chakra Petch'}
+input[type=range]{width:100%;accent-color:var(--b)}
+/* skills */
+.skill{cursor:pointer;padding:6px 0}
+.skill .t{display:flex;justify-content:space-between;font-weight:500}
+.bar{height:14px;border-radius:99px;background:rgba(255,255,255,.12);margin-top:5px;overflow:hidden}
+.bar i{display:block;height:100%;width:0;background:linear-gradient(90deg,var(--a),var(--b));border-radius:99px;transition:width 1.2s cubic-bezier(.2,.8,.2,1)}
+.skill p{max-height:0;overflow:hidden;color:var(--mute);font-size:.92rem;transition:max-height .3s}
+.skill.open p{max-height:80px;padding-top:6px}
+/* inventory */
+.chips{display:flex;flex-wrap:wrap;gap:10px;margin-bottom:14px}
+.chip{border:2px solid var(--a);background:var(--panel);color:var(--ink);border-radius:99px;padding:10px 20px;cursor:pointer;font:500 1rem 'DM Sans';transition:transform .15s}
+.chip:hover{transform:rotate(-3deg) scale(1.05)}
+.chip[aria-pressed=true]{background:var(--a);color:#1b1340}
+/* quests */
+.quests{display:grid;gap:12px}
+.q{cursor:pointer;text-align:left;width:100%;color:var(--ink);font:inherit}
+.q h3{font-size:1.15rem;display:flex;justify-content:space-between}
+.q p{max-height:0;overflow:hidden;color:var(--mute);transition:max-height .3s}
+.q.open p{max-height:90px;margin-top:6px}
+
+/* arcade */
+.tabs{display:flex;flex-wrap:wrap;gap:10px;align-items:center;margin-bottom:14px}
+.gtab{border:2px solid var(--a);background:var(--panel);color:var(--ink);border-radius:99px;padding:10px 20px;cursor:pointer;font:500 1rem 'DM Sans';transition:transform .15s}
+.gtab:hover{transform:rotate(-3deg) scale(1.05)}
+.gtab[aria-pressed=true]{background:var(--a);color:#1b1340}
+.gp{display:none}.gp.on{display:block}
+.gmsg{text-align:center;margin-top:12px;min-height:1.6em;font-weight:500}
+.gbtn{display:block;margin:14px auto 0}
+.mem{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;max-width:400px;margin:0 auto}
+.mc{aspect-ratio:1;border-radius:12px;border:2px solid var(--a);background:var(--bg);color:var(--ink);font-size:clamp(1.6rem,7vw,2.4rem);cursor:pointer;transition:background .2s,transform .15s}
+.mc:hover{transform:scale(1.04)}
+.mc span{visibility:hidden}
+.mc.up,.mc.done{background:var(--a)}
+.mc.up span,.mc.done span{visibility:visible}
+.mc.done{background:var(--y);border-color:var(--y);cursor:default;transform:none}
+#snake{display:block;margin:0 auto;border-radius:var(--r);border:2px dashed var(--a);max-width:100%;height:auto;touch-action:none}
+.dpad{display:grid;grid-template-columns:repeat(3,56px);grid-template-rows:repeat(2,56px);gap:8px;justify-content:center;margin-top:14px}
+.dpad button{border-radius:12px;border:2px solid var(--a);background:var(--panel);color:var(--ink);font-size:1.3rem;cursor:pointer}
+.dpad button:active{background:var(--a);color:#1b1340}
+.ttt{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;max-width:300px;margin:0 auto}
+.tc{aspect-ratio:1;border-radius:12px;border:2px solid var(--a);background:var(--bg);font:700 2.6rem 'Chakra Petch',sans-serif;color:var(--ink);cursor:pointer}
+.tc.x{color:var(--a)}.tc.o{color:var(--b)}
+.tc:disabled{cursor:default}
+footer{text-align:center;padding:50px 0 70px}
+.toast{position:fixed;bottom:22px;left:50%;transform:translate(-50%,90px);background:var(--y);color:#1b1340;font-weight:700;padding:10px 22px;border-radius:99px;transition:transform .3s;z-index:40}
+.toast.on{transform:translate(-50%,0)}
+@media(max-width:760px){.hero{grid-template-columns:1fr;padding-top:24px}}
+@media(prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
+</style>
+</head>
+<body>
+<nav><div class="wrap">
+  <strong class="hud">RMH</strong><span class="sp"></span>
+  <a href="#play">My day</a><a href="#arcade">Arcade</a><a href="#skills">Skills</a><a href="#loot">Favorites</a><a href="#quests">Quests</a>
+  <button class="hue" id="hue" aria-label="Change accent color">Change color</button>
+</div></nav>
+
+<main class="wrap">
+  <header class="hero">
+    <div>
+      <p class="tag">PLAYER 1 · LEVEL 3 · BSIT</p>
+      <h1>Rolie Mart <em>Hingco</em></h1>
+      <p class="line">I'm a <b id="role"></b><span class="cur"></span></p>
+      <p class="sub" id="bio" style="margin-top:12px"></p>
+      <div class="btns">
+        <a class="btn" href="#play">See my day</a>
+        <button class="btn alt" id="copy">Copy my email</button>
+      </div>
+    </div>
+    <div class="card pcard">
+      <div class="pic" id="pic" title="Click me!"><img src="mart.jpeg" alt="Photo of Rolie Mart Hingco" onerror="this.onerror=null;this.src=fb()"></div>
+      <div class="stats"><span>HP ♥♥♥♥♥</span><span id="xp">XP 0</span></div>
+      <p class="sub" style="margin:8px 0 0;font-size:.85rem">Click my photo to earn XP.</p>
+    </div>
+  </header>
+
+  <!-- HCI: User control + immediate feedback - dragging the slider instantly updates the whole card -->
+  <section id="play">
+    <h2>A day in my life</h2>
+    <p class="sub">Drag the slider to see what I'm doing at any time of day.</p>
+    <div class="card dayc">
+      <div class="demo" id="dE">😴</div>
+      <div style="flex:1;min-width:220px">
+        <div class="clock" id="dT">12:00 AM</div>
+        <div id="dX" style="margin:2px 0 10px"></div>
+        <input type="range" id="sl" min="0" max="47" value="0" aria-label="Time of day">
+        <button class="chip" id="now" style="margin-top:12px">What am I doing right now?</button>
+      </div>
+    </div>
+  </section>
+
+  <section id="arcade">
+    <h2>Arcade</h2>
+    <p class="sub">Four mini-games. Every win adds XP to the counter next to my photo.</p>
+    <div class="tabs" id="gtabs" role="group" aria-label="Choose a game"></div>
+
+    <div class="gp on" id="gp-aim">
+      <div class="hud"><span>Time <b id="aT">20</b></span><span>Hits <b id="aH">0</b></span><span>Best <b id="aB">0</b></span></div>
+      <div id="arena">
+        <button id="target" aria-label="Target"></button>
+        <div id="overlay"><div><h3 id="ovH">Aim trainer</h3><p id="ovP">Hit as many targets as you can in 20 seconds. They shrink as you score.</p><button class="btn" id="aimGo">Start</button></div></div>
+      </div>
+    </div>
+
+    <div class="gp" id="gp-mem">
+      <div class="hud"><span>Moves <b id="mM">0</b></span><span>Pairs <b id="mP">0</b>/8</span><span>Best <b id="mB">-</b></span></div>
+      <div class="mem" id="memGrid"></div>
+      <p class="gmsg" id="mMsg">Flip two cards at a time and find all 8 pairs.</p>
+      <button class="btn alt gbtn" id="memNew">New game</button>
+    </div>
+
+    <div class="gp" id="gp-snake">
+      <div class="hud"><span>Score <b id="sS">0</b></span><span>Best <b id="sB">0</b></span></div>
+      <canvas id="snake" width="320" height="320" aria-label="Snake game board"></canvas>
+      <div class="dpad" aria-label="Snake controls">
+        <button id="dU" style="grid-column:2;grid-row:1" aria-label="Up">▲</button>
+        <button id="dL" style="grid-column:1;grid-row:2" aria-label="Left">◀</button>
+        <button id="dD" style="grid-column:2;grid-row:2" aria-label="Down">▼</button>
+        <button id="dR" style="grid-column:3;grid-row:2" aria-label="Right">▶</button>
+      </div>
+      <p class="gmsg" id="sMsg">Use the arrow keys, WASD, the buttons, or swipe.</p>
+      <button class="btn gbtn" id="snGo">Start</button>
+    </div>
+
+    <div class="gp" id="gp-ttt">
+      <div class="hud"><span>You <b id="tW">0</b></span><span>Draws <b id="tD">0</b></span><span>CPU <b id="tL">0</b></span></div>
+      <div class="ttt" id="tttGrid"></div>
+      <p class="gmsg" id="tMsg">You are X. Your move.</p>
+      <button class="btn alt gbtn" id="tNew">New round</button>
+    </div>
+  </section>
+
+  <section id="skills">
+    <h2>Skill tree</h2>
+    <p class="sub">I'm still learning, so these bars show where I am right now. Tap a skill for details.</p>
+    <div class="card" id="skillList"></div>
+  </section>
+
+  <section id="loot">
+    <h2>Favorites</h2>
+    <p class="sub">Pick one to find out why I love it.</p>
+    <div class="chips" id="chips"></div>
+    <div class="card" id="fact" style="min-height:4.2em">Pick a favorite above.</div>
+  </section>
+
+  <section id="quests">
+    <h2>Quest log</h2>
+    <p class="sub">My story as a BSIT student so far. Tap a quest to open it.</p>
+    <div class="quests" id="qList"></div>
+  </section>
+</main>
+
+<footer class="wrap">
+  <h2>Want to team up?</h2>
+  <p class="sub" style="margin:0 auto 18px">Message me about a project, a game night, or a bug you can't fix.</p>
+  <button class="btn" id="copy2">Copy my email</button>
+  <p class="sub" style="margin:22px auto 0;font-size:.85rem">Secret: try the Konami code (↑ ↑ ↓ ↓ ← → ← → B A).</p>
+</footer>
+<div class="toast" id="toast" role="status"></div>
+
+<script>
+/* ===== EDIT THIS PART WITH YOUR REAL DETAILS ===== */
+const ME={
+  initials:"RMH",
+  email:"roliemart108@gmail.com",
+  roles:["BSIT 3rd-year student","programming learner","gamer","future developer"],
+  bio:"I'm still learning programming, one bug at a time. I love video games, and I want to build things people enjoy using.",
+  skills:[
+    {n:"HTML",v:80,d:"I can build page structure: headings, lists, links, images and forms."},
+    {n:"CSS",v:70,d:"Still learning layouts and styling. Every new page teaches me something."},
+    {n:"Python",v:50,d:"Beginner level: I can write basic programs and school activities."},
+    {n:"Teamwork",v:85,d:"This is my strongest skill. I communicate and do my part in group projects."}
+  ],
+  favs:[
+    {n:"Mobile Legends",f:"Teamwork and quick decisions under pressure. Great training for group projects."},
+    {n:"Valorant",f:"Aim, strategy and communication. Every round is a mini problem to solve."},
+    {n:"Minecraft",f:"Where I first got curious about logic and building systems."},
+    {n:"Learning to code",f:"I'm not an expert yet, but I love the moment my code finally runs without errors."}
+  ],
+ 
+quests: [
+  {
+    t: "Year 1: Learn the Basics",
+    d: "I started learning C, C++, HTML, and CSS. These helped me understand programming basics and how to create and design web pages."
+  },
+  {
+    t: "Year 2: Explore More Languages",
+    d: "I learned C# with databases and Java. I continued improving my programming skills and learning how to work with data."
+  },
+  {
+    t: "Year 3: Still Learning, Still Growing",
+    d: "I'm currently learning Python and databases. I'm not an expert yet, but I'm continuing to practice, improve my skills, and learn something new every day."
+  }
+]
+
+};
+/* ================================================== */
+const $=s=>document.querySelector(s),A=s=>[...document.querySelectorAll(s)];
+const toast=m=>{const t=$('#toast');t.textContent=m;t.classList.add('on');clearTimeout(toast.i);toast.i=setTimeout(()=>t.classList.remove('on'),2200)};
+function fb(){return 'data:image/svg+xml,'+encodeURIComponent(`<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 200"><rect width="200" height="200" fill="#ff4fa3"/><text x="100" y="120" font-size="64" font-family="sans-serif" font-weight="800" text-anchor="middle" fill="#1b1340">${ME.initials}</text></svg>`)}
+$('#bio').textContent=ME.bio;
+
+/* typing role */
+let ri=0,ci=0,del=false;
+(function ty(){const w=ME.roles[ri];$('#role').textContent=w.slice(0,ci)||'\u00a0';
+ if(!del&&ci===w.length){del=true;return setTimeout(ty,1400)}
+ if(del&&ci===0){del=false;ri=(ri+1)%ME.roles.length}
+ ci+=del?-1:1;setTimeout(ty,del?35:75)})();
+
+/* XP from photo clicks (Feedback) */
+let xp=0;const fxs=['⭐','💥','🎮','✨','🔥'];
+$('#pic').onclick=e=>{addXP(10);
+ const s=document.createElement('span');s.className='fx';s.textContent=fxs[Math.random()*5|0];s.style.left=e.clientX-16+'px';s.style.top=e.clientY-16+'px';document.body.appendChild(s);setTimeout(()=>s.remove(),1000);
+ if(xp===100)toast('Level up! You found the secret XP.')};
+
+/* day in my life */
+const DAY=[
+ [0,"😴","Sleeping."],
+ [8,"🌅","Just woke up."],
+ [9,"🚴","Exercising on the stationary bike."],
+ [10,"🍳","Eating breakfast."],
+ [11,"🎒","Preparing for school."],
+ [12,"🏫","At school. Classes until 9:30 PM."],
+ [21.5,"🚌","Leaving school and heading home."],
+ [22,"🍽️","Having dinner."],
+ [23,"😴","Time to sleep."]
+];
+const sl=$('#sl');
+function showDay(){const m=+sl.value*30,h=m/60;let c=DAY[0];DAY.forEach(d=>{if(h>=d[0])c=d});
+ $('#dE').textContent=c[1];$('#dX').textContent=c[2];
+ const hh=Math.floor(h),mm=m%60;$('#dT').textContent=((hh%12)||12)+':'+String(mm).padStart(2,'0')+' '+(hh<12?'AM':'PM')}
+sl.oninput=showDay;showDay();
+$('#now').onclick=()=>{const n=new Date();sl.value=n.getHours()*2+(n.getMinutes()>=30?1:0);showDay();toast('Showing the current time')};
+
+/* skills / favs / quests */
+ME.skills.forEach(s=>{const d=document.createElement('div');d.className='skill';d.tabIndex=0;d.setAttribute('role','button');
+ d.innerHTML=`<div class="t"><span>${s.n}</span><span>${s.v}%</span></div><div class="bar"><i data-w="${s.v}"></i></div><p>${s.d}</p>`;
+ const f=()=>d.classList.toggle('open');d.onclick=f;d.onkeydown=e=>{if(e.key==='Enter'||e.key===' '){e.preventDefault();f()}};$('#skillList').appendChild(d)});
+new IntersectionObserver((es,o)=>es.forEach(e=>{if(e.isIntersecting){A('#skillList i').forEach(i=>i.style.width=i.dataset.w+'%');o.disconnect()}}),{threshold:.3}).observe($('#skillList'));
+ME.favs.forEach(h=>{const c=document.createElement('button');c.className='chip';c.textContent=h.n;c.setAttribute('aria-pressed','false');
+ c.onclick=()=>{A('.chip').forEach(x=>x.setAttribute('aria-pressed','false'));c.setAttribute('aria-pressed','true');$('#fact').textContent=h.f};$('#chips').appendChild(c)});
+ME.quests.forEach(q=>{const b=document.createElement('button');b.className='card q';b.innerHTML=`<h3>${q.t}<span>+</span></h3><p>${q.d}</p>`;
+ b.onclick=()=>{b.classList.toggle('open');b.querySelector('span').textContent=b.classList.contains('open')?'−':'+'};$('#qList').appendChild(b)});
+
+/* accent color (User control) */
+const hues=[['#38e8ff','#ff4fa3'],['#7dff8a','#ffd23f'],['#ffb347','#ff4f6d'],['#c79bff','#38e8ff']];let hi=0;
+$('#hue').onclick=()=>{hi=(hi+1)%hues.length;document.documentElement.style.setProperty('--a',hues[hi][0]);document.documentElement.style.setProperty('--b',hues[hi][1])};
+
+/* copy email */
+const cp=()=>{(navigator.clipboard?navigator.clipboard.writeText(ME.email):Promise.reject()).then(()=>toast('Email copied!')).catch(()=>toast('My email: '+ME.email))};
+$('#copy').onclick=cp;$('#copy2').onclick=cp;
+
+/* confetti + Konami */
+function confetti(){const cv=document.createElement('canvas');cv.style.cssText='position:fixed;inset:0;pointer-events:none;z-index:50';cv.width=innerWidth;cv.height=innerHeight;document.body.appendChild(cv);const x=cv.getContext('2d');
+ const p=Array.from({length:120},()=>({x:innerWidth/2,y:innerHeight/2,vx:(Math.random()-.5)*16,vy:Math.random()*-14-2,c:['#38e8ff','#ffd23f','#ff4fa3','#7dff8a'][Math.random()*4|0],s:Math.random()*8+4}));let f=0;
+ (function a(){x.clearRect(0,0,cv.width,cv.height);p.forEach(q=>{q.x+=q.vx;q.y+=q.vy;q.vy+=.4;x.fillStyle=q.c;x.fillRect(q.x,q.y,q.s,q.s)});++f<110?requestAnimationFrame(a):cv.remove()})()}
+const kc=['ArrowUp','ArrowUp','ArrowDown','ArrowDown','ArrowLeft','ArrowRight','ArrowLeft','ArrowRight','b','a'];let ki=0;
+addEventListener('keydown',e=>{ki=(e.key===kc[ki]||e.key.toLowerCase()===kc[ki])?ki+1:0;if(ki===kc.length){ki=0;confetti();toast('Cheat code activated! +30 lives')}});
+
+/* ===== ARCADE ===== */
+function addXP(n){xp+=n;$('#xp').textContent='XP '+xp;$('#axp').textContent=xp}
+const store={get:k=>{try{return +localStorage.getItem('rmh_'+k)||0}catch(e){return 0}},set:(k,v)=>{try{localStorage.setItem('rmh_'+k,v)}catch(e){}}};
+const shuffle=a=>{for(let i=a.length-1;i>0;i--){const j=Math.random()*(i+1)|0;[a[i],a[j]]=[a[j],a[i]]}return a};
+const gain=(n,why)=>{if(n>0){addXP(n);toast('+'+n+' XP · '+why)}};
+
+/* tabs */
+const GP=[['aim','Aim trainer'],['mem','Memory match'],['snake','Snake'],['ttt','Tic-tac-toe']];
+const tabs=$('#gtabs');
+GP.forEach((g,i)=>{const b=document.createElement('button');b.className='gtab';b.textContent=g[1];b.setAttribute('aria-pressed',i===0);b.onclick=()=>openGame(g[0],b);tabs.appendChild(b)});
+const xpEl=document.createElement('span');xpEl.className='hud';xpEl.style.marginLeft='auto';xpEl.innerHTML='XP <b id="axp" style="color:var(--y)">0</b>';tabs.appendChild(xpEl);
+let curGame='aim';
+function openGame(id,btn){aimStop();snStop();curGame=id;
+ A('.gtab').forEach(x=>x.setAttribute('aria-pressed','false'));btn.setAttribute('aria-pressed','true');
+ A('.gp').forEach(p=>p.classList.toggle('on',p.id==='gp-'+id))}
+
+/* 1. Aim trainer (uses the arena styles) */
+const aim={on:false,t:20,s:0,iv:null,mv:null};
+const arena=$('#arena'),tg=$('#target'),ov=$('#overlay');
+$('#aB').textContent=store.get('aim');
+function aimPlace(){const size=Math.max(36,64-aim.s*2);
+ tg.style.width=tg.style.height=size+'px';
+ tg.style.left=Math.random()*(arena.clientWidth-size)+'px';tg.style.top=Math.random()*(arena.clientHeight-size)+'px';tg.style.display='block';
+ clearTimeout(aim.mv);aim.mv=setTimeout(aimPlace,1400)}
+function aimStop(){aim.on=false;clearInterval(aim.iv);clearTimeout(aim.mv);tg.style.display='none';ov.style.display='grid'}
+function aimStart(){aim.on=true;aim.t=20;aim.s=0;$('#aT').textContent=20;$('#aH').textContent=0;ov.style.display='none';aimPlace();
+ clearInterval(aim.iv);aim.iv=setInterval(()=>{$('#aT').textContent=--aim.t;if(aim.t<=0)aimEnd()},1000)}
+function aimEnd(){const s=aim.s;aimStop();
+ const best=Math.max(s,store.get('aim'));store.set('aim',best);$('#aB').textContent=best;
+ $('#ovH').textContent=s>=best&&s>0?'New best: '+s+' hits!':'You hit '+s+' targets';
+ $('#ovP').textContent='Best so far: '+best+'. Can you beat it?';$('#aimGo').textContent='Play again';gain(s*2,'Aim trainer')}
+tg.onclick=e=>{e.stopPropagation();if(!aim.on)return;aim.s++;$('#aH').textContent=aim.s;aimPlace()};
+$('#aimGo').onclick=aimStart;
+
+/* 2. Memory match */
+const MEMS=['🎮','🕹️','👾','🏆','⚔️','🎯','🧩','💎'];
+const mem={first:null,lock:false,moves:0,found:0};
+const mb=store.get('mem');$('#mB').textContent=mb||'-';
+function memNew(){mem.first=null;mem.lock=false;mem.moves=0;mem.found=0;
+ $('#mM').textContent=0;$('#mP').textContent=0;$('#mMsg').textContent='Flip two cards at a time and find all 8 pairs.';
+ const g=$('#memGrid');g.innerHTML='';
+ shuffle([...MEMS,...MEMS]).forEach((e,i)=>{const c=document.createElement('button');c.className='mc';c.dataset.e=e;c.setAttribute('aria-label','Card '+(i+1));c.innerHTML='<span>'+e+'</span>';c.onclick=()=>memFlip(c);g.appendChild(c)})}
+function memFlip(c){if(mem.lock||c.classList.contains('up')||c.classList.contains('done'))return;
+ c.classList.add('up');
+ if(!mem.first){mem.first=c;return}
+ mem.moves++;$('#mM').textContent=mem.moves;const a=mem.first;mem.first=null;
+ if(a.dataset.e===c.dataset.e){a.className=c.className='mc done';mem.found++;$('#mP').textContent=mem.found;if(mem.found===8)memWin()}
+ else{mem.lock=true;setTimeout(()=>{a.classList.remove('up');c.classList.remove('up');mem.lock=false},700)}}
+function memWin(){const m=mem.moves,b=store.get('mem');
+ if(!b||m<b){store.set('mem',m);$('#mB').textContent=m}
+ $('#mMsg').textContent='Cleared in '+m+' moves. Nice memory!';gain(Math.max(20,100-m*4),'Memory match')}
+$('#memNew').onclick=memNew;memNew();
+
+/* 3. Snake */
+const SN={c:$('#snake'),n:20,cell:16,s:[],d:{x:1,y:0},nd:{x:1,y:0},f:{x:0,y:0},sc:0,iv:null,run:false};
+SN.x=SN.c.getContext('2d');$('#sB').textContent=store.get('snake');
+function snFood(){do{SN.f={x:Math.random()*SN.n|0,y:Math.random()*SN.n|0}}while(SN.s.some(p=>p.x===SN.f.x&&p.y===SN.f.y))}
+function snReset(){SN.s=[{x:9,y:10},{x:8,y:10},{x:7,y:10}];SN.d={x:1,y:0};SN.nd={x:1,y:0};SN.sc=0;$('#sS').textContent=0;snFood()}
+function snDraw(){const x=SN.x,cs=getComputedStyle(document.documentElement),a=cs.getPropertyValue('--a').trim(),b=cs.getPropertyValue('--b').trim(),y=cs.getPropertyValue('--y').trim(),k=SN.cell;
+ x.fillStyle='#201650';x.fillRect(0,0,320,320);
+ x.fillStyle=y;x.beginPath();x.arc(SN.f.x*k+k/2,SN.f.y*k+k/2,k/2-2,0,7);x.fill();
+ SN.s.forEach((p,i)=>{x.fillStyle=i?a:b;x.fillRect(p.x*k+1,p.y*k+1,k-2,k-2)})}
+function snStop(){SN.run=false;clearInterval(SN.iv)}
+function snStart(){snReset();SN.run=true;$('#sMsg').textContent='Eat the yellow dots. Do not hit the walls or yourself.';snDraw();clearInterval(SN.iv);SN.iv=setInterval(snTick,115);$('#snGo').textContent='Restart'}
+function snTick(){SN.d=SN.nd;const h={x:SN.s[0].x+SN.d.x,y:SN.s[0].y+SN.d.y};
+ if(h.x<0||h.y<0||h.x>=SN.n||h.y>=SN.n||SN.s.some(p=>p.x===h.x&&p.y===h.y))return snEnd();
+ SN.s.unshift(h);
+ if(h.x===SN.f.x&&h.y===SN.f.y){SN.sc++;$('#sS').textContent=SN.sc;snFood()}else SN.s.pop();
+ snDraw()}
+function snEnd(){snStop();const s=SN.sc,b=Math.max(s,store.get('snake'));store.set('snake',b);$('#sB').textContent=b;
+ $('#sMsg').textContent='Game over. Score: '+s+'. Press Start to try again.';$('#snGo').textContent='Start';gain(s*3,'Snake')}
+function snDir(x,y){if(!SN.run||(x===-SN.d.x&&y===-SN.d.y))return;SN.nd={x,y}}
+const KEYS={ArrowUp:[0,-1],w:[0,-1],ArrowDown:[0,1],s:[0,1],ArrowLeft:[-1,0],a:[-1,0],ArrowRight:[1,0],d:[1,0]};
+addEventListener('keydown',e=>{if(curGame!=='snake'||!SN.run)return;const k=KEYS[e.key]||KEYS[e.key.toLowerCase()];if(k){e.preventDefault();snDir(k[0],k[1])}});
+$('#dU').onclick=()=>snDir(0,-1);$('#dD').onclick=()=>snDir(0,1);$('#dL').onclick=()=>snDir(-1,0);$('#dR').onclick=()=>snDir(1,0);
+let tx=0,ty=0;
+SN.c.addEventListener('touchstart',e=>{tx=e.touches[0].clientX;ty=e.touches[0].clientY},{passive:true});
+SN.c.addEventListener('touchend',e=>{const dx=e.changedTouches[0].clientX-tx,dy=e.changedTouches[0].clientY-ty;if(Math.max(Math.abs(dx),Math.abs(dy))<20)return;
+ Math.abs(dx)>Math.abs(dy)?snDir(dx>0?1:-1,0):snDir(0,dy>0?1:-1)});
+$('#snGo').onclick=snStart;snReset();snDraw();
+
+/* 4. Tic-tac-toe vs CPU */
+const LN=[[0,1,2],[3,4,5],[6,7,8],[0,3,6],[1,4,7],[2,5,8],[0,4,8],[2,4,6]];
+let tb=[],tOver=false;const tsc={w:0,d:0,l:0};
+const tWin=b=>{for(const [p,q,r] of LN)if(b[p]&&b[p]===b[q]&&b[p]===b[r])return b[p];return b.every(Boolean)?'draw':null};
+function tScore(b,p){const r=tWin(b);if(r==='O')return 1;if(r==='X')return -1;if(r==='draw')return 0;
+ let best=p==='O'?-2:2;for(let i=0;i<9;i++)if(!b[i]){b[i]=p;const v=tScore(b,p==='O'?'X':'O');b[i]='';best=p==='O'?Math.max(best,v):Math.min(best,v)}return best}
+function tCpu(){const e=tb.map((v,i)=>v?-1:i).filter(i=>i>=0);
+ if(Math.random()<.3)return e[Math.random()*e.length|0];
+ let best=-2,m=[];e.forEach(i=>{tb[i]='O';const v=tScore(tb,'X');tb[i]='';if(v>best){best=v;m=[i]}else if(v===best)m.push(i)});
+ return m[Math.random()*m.length|0]}
+function tDraw(){A('.tc').forEach((c,i)=>{c.textContent=tb[i];c.className='tc '+tb[i].toLowerCase();c.disabled=tOver||!!tb[i]})}
+function tScores(){$('#tW').textContent=tsc.w;$('#tD').textContent=tsc.d;$('#tL').textContent=tsc.l}
+function tCheck(){const r=tWin(tb);if(!r)return false;tOver=true;
+ if(r==='X'){tsc.w++;$('#tMsg').textContent='You win!';gain(40,'Tic-tac-toe')}
+ else if(r==='O'){tsc.l++;$('#tMsg').textContent='CPU wins this round.'}
+ else{tsc.d++;$('#tMsg').textContent="It's a draw.";gain(15,'Tic-tac-toe')}
+ tScores();tDraw();return true}
+function tNew(){tb=Array(9).fill('');tOver=false;$('#tMsg').textContent='You are X. Your move.';tDraw()}
+(function(){const g=$('#tttGrid');for(let i=0;i<9;i++){const c=document.createElement('button');c.className='tc';c.setAttribute('aria-label','Row '+(Math.floor(i/3)+1)+', column '+(i%3+1));
+ c.onclick=()=>{if(tOver||tb[i])return;tb[i]='X';tDraw();if(tCheck())return;tb[tCpu()]='O';tDraw();tCheck()};g.appendChild(c)}})();
+$('#tNew').onclick=tNew;tNew();
+</script>
+</body>
+</html>
